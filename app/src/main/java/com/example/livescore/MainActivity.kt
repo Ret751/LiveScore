@@ -12,6 +12,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvMenu: TextView
     private lateinit var tvToday: TextView
 
+    private val BASE_URL = "http://192.168.0.2:8080"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
