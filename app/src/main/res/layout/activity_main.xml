@@ -1,204 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#101411">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- 전체 콘텐츠 -->
-    <LinearLayout
-        android:id="@+id/mainContent"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNav"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:background="#101411">
 
-        <!-- 상단 헤더 -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/imgLogo"
-                android:layout_width="120dp"
-                android:layout_height="40dp"
-                android:src="@drawable/livescore1"
-                android:scaleType="fitStart" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/tvToday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1월 2일"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:layout_marginEnd="16dp" />
-
-            <TextView
-                android:id="@+id/tvMenu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="☰"
-                android:textColor="#FFFFFF"
-                android:textSize="26sp" />
-        </LinearLayout>
-
-        <!-- 날짜 가로 리스트 -->
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:scrollbars="none"
-            android:layout_marginTop="12dp">
+            android:layout_height="match_parent"
+            android:layout_above="@id/bottomNav"
+            android:orientation="vertical"
+            android:padding="20dp">
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <TextView
-                    style="@style/DateItemStyle"
-                    android:text="28\n일" />
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/livescore1"
+                    android:scaleType="fitStart" />
+
+                <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
 
                 <TextView
-                    style="@style/DateItemStyle"
-                    android:text="29\n월" />
-
-                <TextView
-                    style="@style/DateItemStyle"
-                    android:text="30\n화" />
-
-                <TextView
-                    style="@style/DateItemSelectedStyle"
-                    android:text="31\n수" />
-
-                <TextView
-                    style="@style/DateItemStyle"
-                    android:text="1\n목" />
-
-                <TextView
-                    style="@style/DateItemStyle"
-                    android:text="2\n금" />
-
-                <TextView
-                    style="@style/DateItemStyle"
-                    android:text="3\n토" />
-
+                    android:id="@+id/btnCalendar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="26/5/6 ▼"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="10dp"
+                    android:background="#181C19" />
             </LinearLayout>
-        </HorizontalScrollView>
 
-        <!-- 팔로잉 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Following"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginTop="20dp" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDateList"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginTop="12dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="90dp"
-            android:background="@drawable/card_bg"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginTop="10dp">
+            <!-- 5대 리그 탭 추가됨 -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tabAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="전체"
+                        android:textColor="#20E07A"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/tabEpl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="EPL"
+                        android:textColor="#888888"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/tabLaLiga"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="라리가"
+                        android:textColor="#888888"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/tabSerieA"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="세리에 A"
+                        android:textColor="#888888"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/tabBundesliga"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="분데스리가"
+                        android:textColor="#888888"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"
+                        android:layout_marginEnd="12dp"/>
+
+                    <TextView
+                        android:id="@+id/tabLigue1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="리그 1"
+                        android:textColor="#888888"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:padding="8dp"/>
+                </LinearLayout>
+            </HorizontalScrollView>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="팔로잉한 경기가 없습니다"
-                android:textColor="#9A9A9A"
-                android:textSize="15sp" />
-
-        </LinearLayout>
-
-        <!-- 오늘 경기 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Today Matches"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp" />
-
-        <!-- 경기 카드 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="130dp"
-            android:background="@drawable/card_bg"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Premier League"
+                android:text="Today Matches"
                 android:textColor="#FFFFFF"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:textSize="15sp" />
+                android:layout_marginTop="16dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="21:00"
-                android:textColor="#20E07A"
-                android:textSize="14sp"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMatches"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginTop="10dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Chelsea  vs  Arsenal"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:layout_marginTop="8dp" />
-
         </LinearLayout>
 
-    </LinearLayout>
-
-    <!-- 하단 네비게이션 -->
-    <LinearLayout
-        android:id="@+id/bottomNav"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:layout_alignParentBottom="true"
-        android:background="#181C19"
-        android:orientation="horizontal"
-        android:gravity="center">
-
-        <TextView
-            android:id="@+id/navMatch"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="경기"
-            android:textColor="#20E07A"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/navSearch"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="검색"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+        <LinearLayout
+            android:id="@+id/bottomNav"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_alignParentBottom="true"
+            android:background="#181C19"
+            android:orientation="horizontal">
+            <TextView android:id="@+id/navMatch" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="경기" android:textColor="#20E07A" android:textStyle="bold" />
+            <TextView android:id="@+id/navSearch" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="검색" android:textColor="#FFFFFF" />
+        </LinearLayout>
+    </RelativeLayout>
+</layout>

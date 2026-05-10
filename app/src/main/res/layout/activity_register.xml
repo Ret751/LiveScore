@@ -8,16 +8,17 @@
     android:background="#101411"
     android:padding="24dp">
 
-    <!-- 로고 -->
-    <ImageView
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:src="@drawable/livescore1"
-        android:layout_marginBottom="32dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="S-SCORE 가입하기"
+        android:textColor="#00FF85"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="40dp"/>
 
-    <!-- 이메일 입력 -->
     <EditText
-        android:id="@+id/etEmail"
+        android:id="@+id/etRegEmail"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:hint="Email"
@@ -27,34 +28,33 @@
         android:padding="12dp"
         android:layout_marginBottom="16dp"/>
 
-    <!-- 비밀번호 입력 -->
     <EditText
-        android:id="@+id/etPassword"
+        android:id="@+id/etRegPassword"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Password"
+        android:hint="Password (특수문자 포함 8자 이상)"
         android:textColor="#FFFFFF"
         android:textColorHint="#9A9A9A"
         android:background="@drawable/edittext_bg"
         android:inputType="textPassword"
         android:padding="12dp"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginBottom="32dp"/>
 
-    <!-- 로그인 버튼 -->
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnRegister"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:text="로그인"
-        android:textColor="#000000"
-        android:backgroundTint="#20E07A"/>
+        android:layout_height="55dp"
+        android:text="가입 완료"
+        android:textColor="#101411"
+        android:backgroundTint="#00FF85"
+        android:textStyle="bold"
+        android:textSize="18sp"/>
 
-    <!-- 회원가입 버튼 -->
     <TextView
-        android:id="@+id/tvGoToRegister"
+        android:id="@+id/tvBackToLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="회원가입"
+        android:text="이미 계정이 있나요? 로그인"
         android:textColor="#9A9A9A"
         android:layout_marginTop="16dp"
         android:padding="8dp"/>
