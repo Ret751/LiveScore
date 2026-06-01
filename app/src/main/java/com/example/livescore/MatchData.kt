@@ -28,6 +28,7 @@ data class LineupData(
 )
 
 data class PlayerData(
+    val id: Long?,
     val name: String,
     val number: Int?,
     val pos: String?,

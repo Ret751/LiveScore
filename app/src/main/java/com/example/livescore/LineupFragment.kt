@@ -1,14 +1,22 @@
-package com.example.livescore // 본인 패키지명 확인
+package com.example.livescore
 
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.livescore.databinding.FragmentLineupBinding
-import retrofit2.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import kotlin.math.max
 
 class LineupFragment : Fragment() {
     private var _binding: FragmentLineupBinding? = null
@@ -30,68 +38,153 @@ class LineupFragment : Fragment() {
             override fun onResponse(call: Call<List<LineupData>>, response: Response<List<LineupData>>) {
                 if (response.isSuccessful) {
                     val lineups = response.body() ?: return
-                    if (lineups.isNotEmpty()) {
-                        // 홈팀 라인업 기준으로 먼저 구현
-                        drawLineup(lineups[0])
+                    if (lineups.size >= 2) {
+                        renderFullMatchLineup(lineups[0], lineups[1])
+                    } else if (lineups.isNotEmpty()) {
+                        binding.tvHomeCoach.text = lineups[0].coachName ?: "감독 정보 없음"
+                        drawPitchLineup(lineups[0])
                     }
+                } else {
+                    Log.e("LineupFragment", "서버 응답 실패: ${response.code()}")
                 }
             }
+
             override fun onFailure(call: Call<List<LineupData>>, t: Throwable) {
-                Log.e("DEBUG", "라인업 로드 실패: ${t.message}")
+                Log.e("LineupFragment", "통신 실패: ${t.message}")
             }
         })
     }
 
-    // 🌟 축구장에 선수를 그리는 핵심 함수
-    private fun drawLineup(data: LineupData) {
-        context ?: return
-        val pitch = binding.pitchContainer
-        pitch.removeAllViews() // 기존 선수 제거
+    private fun renderFullMatchLineup(homeLineup: LineupData, awayLineup: LineupData) {
+        binding.tvTargetTeamName.text = "${homeLineup.teamName} vs ${awayLineup.teamName}"
+        binding.tvFormation.text = "포메이션: ${homeLineup.formation ?: "-"} (홈) / ${awayLineup.formation ?: "-"} (원정)"
 
-        // 1. 포메이션 & 팀 이름 업데이트
-        binding.tvFormation.text = "포메이션: ${data.formation}"
-        binding.tvTargetTeamName.text = data.teamName
+        // 그라운드 선발 라인업 드로우
+        drawPitchLineup(homeLineup)
 
-        // 2. 선발 선수 배치 (startXI)
-        for (player in data.startXI) {
-            val grid = player.grid ?: continue // 좌표 데이터 없으면 패스
+        // 감독 데이터 세팅
+        binding.tvHomeCoach.text = homeLineup.coachName ?: "감독 미정"
+        binding.tvAwayCoach.text = awayLineup.coachName ?: "감독 미정"
 
-            // 아이템 인플레이트
-            val playerView = LayoutInflater.from(context).inflate(R.layout.item_player_pitch, pitch, false)
-            playerView.id = View.generateViewId() // 동적 ID 부여
+        // 교체 선수 레이아웃 빌드
+        val subContainer = binding.substitutesContainer
+        subContainer.removeAllViews()
 
-            // 데이터 세팅
-            playerView.findViewById<TextView>(R.id.tvPlayerNumber).text = player.number?.toString() ?: ""
-            playerView.findViewById<TextView>(R.id.tvPlayerName).text = player.name
+        val homeSubs = homeLineup.substitutes
+        val awaySubs = awayLineup.substitutes
+        val maxSubCount = max(homeSubs.size, awaySubs.size)
 
-            // 뷰 추가
-            pitch.addView(playerView)
+        for (i in 0 until maxSubCount) {
+            val rowView = layoutInflater.inflate(R.layout.item_substitute_row, subContainer, false)
 
-            // 3. 🌟 ConstraintSet을 이용한 좌표 배치 (핵심!)
-            val coords = grid.split(":") // "2:3" -> ["2", "3"]
-            val row = coords[0].toFloat() // 수직 (골대 -> 공격)
-            val col = coords[1].toFloat() // 수전 (왼쪽 -> 오른쪽)
+            // 홈팀 레이아웃 및 뷰 참조
+            val layoutHome = rowView.findViewById<View>(R.id.layoutHomeSub)
+            val ivHomePhoto = rowView.findViewById<ImageView>(R.id.ivHomeSubPhoto)
+            val tvHomeNumber = rowView.findViewById<TextView>(R.id.tvHomeSubNumber)
+            val tvHomePlayer = rowView.findViewById<TextView>(R.id.tvHomeSubPlayer)
 
-            // API 좌표계를 화면 좌표(Bias)로 변환 (0.0 ~ 1.0)
-            // 수직(Row): 1은 골키퍼, 높을수록 공격수 (보통 5까지)
-            val vBias = when(row) {
-                1f -> 0.92f // 골키퍼 (맨 아래)
-                2f -> 0.70f // 수비수
-                3f -> 0.45f // 미드필더
-                4f -> 0.20f // 공격수
-                5f -> 0.08f // 최전방
-                else -> 0.5f
+            // 원정팀 레이아웃 및 뷰 참조
+            val layoutAway = rowView.findViewById<View>(R.id.layoutAwaySub)
+            val ivAwayPhoto = rowView.findViewById<ImageView>(R.id.ivAwaySubPhoto)
+            val tvAwayNumber = rowView.findViewById<TextView>(R.id.tvAwaySubNumber)
+            val tvAwayPlayer = rowView.findViewById<TextView>(R.id.tvAwaySubPlayer)
+
+            // 홈팀 교체선수 데이터 바인딩
+            if (i < homeSubs.size) {
+                val p = homeSubs[i]
+                layoutHome.visibility = View.VISIBLE
+                tvHomeNumber.text = (p.number ?: "").toString()
+                tvHomePlayer.text = p.name
+
+                p.id?.let { playerId ->
+                    Glide.with(this)
+                        .load("https://media.api-sports.io/football/players/$playerId.png")
+                        .transform(CircleCrop())
+                        .into(ivHomePhoto)
+                }
             }
 
-            // 수평(Col): 총 개수에 따라 다름 (예: 수비 4명이면 1,2,3,4)
-            // 해당 로우에 선수가 몇 명인지 파악해서 비율로 배치하는 것이 정확하나,
-            // 간단하게 4분할/3분할 비율로 기본 구현
-            val maxCol = data.formation?.split("-")?.let { it.getOrNull(row.toInt()-2)?.toFloat() } ?: 4f // 임시
-            val hBias = (col / (maxCol + 1))
+            // 원정팀 교체선수 데이터 바인딩
+            if (i < awaySubs.size) {
+                val p = awaySubs[i]
+                layoutAway.visibility = View.VISIBLE
+                tvAwayNumber.text = (p.number ?: "").toString()
+                tvAwayPlayer.text = p.name
+
+                p.id?.let { playerId ->
+                    Glide.with(this)
+                        .load("https://media.api-sports.io/football/players/$playerId.png")
+                        .transform(CircleCrop())
+                        .into(ivAwayPhoto)
+                }
+            }
+
+            subContainer.addView(rowView)
+        }
+    }
+
+    private fun drawPitchLineup(lineup: LineupData) {
+        val pitch = binding.pitchContainer
+        pitch.removeAllViews()
+
+        val formationStr = lineup.formation ?: "4-4-2"
+        val formationLines = formationStr.split("-")
+
+        val rowCountMap = mutableMapOf<Int, Int>()
+        rowCountMap[1] = 1
+
+        for (i in formationLines.indices) {
+            val rowNum = i + 2
+            val count = formationLines[i].toIntOrNull() ?: 4
+            rowCountMap[rowNum] = count
+        }
+
+        val totalRows = formationLines.size + 1
+
+        lineup.startXI.forEach { player ->
+            val grid = player.grid ?: return@forEach
+            val parts = grid.split(":")
+            val row = parts.getOrNull(0)?.toFloatOrNull() ?: return@forEach
+            val col = parts.getOrNull(1)?.toFloatOrNull() ?: return@forEach
+
+            // 가로 정렬로 교정된 레이아웃 인플레이트
+            val playerView = layoutInflater.inflate(R.layout.item_player_pitch, pitch, false)
+            playerView.id = View.generateViewId()
+
+            val ivPhoto = playerView.findViewById<ImageView>(R.id.ivPlayerPhoto)
+            val tvResultNumber = playerView.findViewById<TextView>(R.id.tvPlayerNumber)
+            val tvResultName = playerView.findViewById<TextView>(R.id.tvPlayerName)
+
+            // 데이터 세팅
+            tvResultNumber.text = (player.number ?: "").toString()
+            tvResultName.text = player.name
+
+            // 맨 위 이미지 뷰에 페이스샷 로드 (원형)
+            player.id?.let { playerId ->
+                Glide.with(this)
+                    .load("https://media.api-sports.io/football/players/$playerId.png")
+                    .transform(CircleCrop())
+                    .into(ivPhoto)
+            }
+
+            pitch.addView(playerView)
+
+            // 수직/수평 정밀 배치 알고리즘 수식 계산
+            val vBias = when (row.toInt()) {
+                1 -> 0.92f
+                else -> {
+                    val minV = 0.10f
+                    val maxV = 0.75f
+                    maxV - ((row - 2) * (maxV - minV) / (totalRows - 1))
+                }
+            }
+
+            val maxColInThisRow = rowCountMap[row.toInt()]?.toFloat() ?: 4f
+            val hBias = col / (maxColInThisRow + 1f)
 
             val set = ConstraintSet()
             set.clone(pitch)
-            // 중앙(부모)에 정렬하고 Bias로 위치 조절
+
             set.connect(playerView.id, ConstraintSet.TOP, pitch.id, ConstraintSet.TOP)
             set.connect(playerView.id, ConstraintSet.BOTTOM, pitch.id, ConstraintSet.BOTTOM)
             set.connect(playerView.id, ConstraintSet.START, pitch.id, ConstraintSet.START)
@@ -99,20 +192,13 @@ class LineupFragment : Fragment() {
 
             set.setHorizontalBias(playerView.id, hBias)
             set.setVerticalBias(playerView.id, vBias)
+
             set.applyTo(pitch)
         }
-
-        // 4. 교체 명단은 기존 RecyclerView 어댑터 구현 방법과 동일 (생략)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        fun newInstance(fixtureId: Long) = LineupFragment().apply {
-            arguments = Bundle().apply { putLong("fixtureId", fixtureId) }
-        }
     }
 }

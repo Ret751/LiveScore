@@ -6,29 +6,43 @@
     android:orientation="vertical">
 
     <FrameLayout
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:background="@drawable/bg_player_circle">
+        android:layout_width="45dp"
+        android:layout_height="45dp">
+
+        <ImageView
+            android:id="@+id/ivPlayerPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/ic_launcher"
+            android:scaleType="centerCrop"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/tvPlayerNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="10"
-            android:textColor="#101411"
-            android:textSize="14sp"
+            android:text="11"
+            android:textColor="#20E07A"
+            android:textSize="11sp"
             android:textStyle="bold" />
-    </FrameLayout>
 
-    <TextView
-        android:id="@+id/tvPlayerName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="Messi"
-        android:textColor="#FFFFFF"
-        android:textSize="11sp"
-        android:ellipsize="end"
-        android:maxLines="1" />
+        <TextView
+            android:id="@+id/tvPlayerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:text="Salah"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+    </LinearLayout>
 </LinearLayout>
