@@ -1,4 +1,4 @@
-package com.example.livescore // 본인 패키지명 확인!
+package com.example.livescore
 
 import android.app.DatePickerDialog
 import android.graphics.Color
@@ -169,14 +169,28 @@ class MainActivity : AppCompatActivity() {
         val targetSeason = if (month <= 7) selectedDate.year - 1 else selectedDate.year
         val targetDateStr = selectedDate.format(DateTimeFormatter.ofPattern("MM-dd"))
 
+        // 🌟 [진단 로그 1] 앱이 필터링하려고 하는 기준값 콘솔 출력
+        Log.d("SOCCER_DIAGNOSIS", "=======================================")
+        Log.d("SOCCER_DIAGNOSIS", "🟢 현재 앱 선택 날짜 문자열: $targetDateStr")
+        Log.d("SOCCER_DIAGNOSIS", "🟢 현재 앱 계산 타겟 시즌: $targetSeason")
+        Log.d("SOCCER_DIAGNOSIS", "🟢 서버에서 들고 있는 총 경기 수: ${allMatches.size}")
+
         val filteredList = allMatches.filter { match ->
             val dbDate = match.matchDate ?: ""
             val isDateMatch = dbDate.contains(targetDateStr)
             val isSeasonMatch = match.season == targetSeason
             val isLeagueMatch = if (currentLeagueId == null) true else (match.leagueId == currentLeagueId)
 
+            // 🌟 [진단 로그 2] 데이터가 왜 걸러지는지 상위 2개만 샘플로 매칭 상태 출력
+            if (allMatches.indexOf(match) < 2) {
+                Log.d("SOCCER_DIAGNOSIS", "👉 샘플 매칭 확인 -> DB날짜: '$dbDate' (일치: $isDateMatch) | DB시즌: ${match.season} (일치: $isSeasonMatch)")
+            }
+
             isDateMatch && isSeasonMatch && isLeagueMatch
         }
+
+        Log.d("SOCCER_DIAGNOSIS", "🟢 필터링 통과해서 화면에 그려질 경기 수: ${filteredList.size}")
+        Log.d("SOCCER_DIAGNOSIS", "=======================================")
 
         matchAdapter.updateData(filteredList)
 
@@ -188,14 +202,18 @@ class MainActivity : AppCompatActivity() {
     private fun loadDataFromServer() {
         RetrofitClient.apiService.getMatches().enqueue(object : Callback<List<MatchData>> {
             override fun onResponse(call: Call<List<MatchData>>, response: Response<List<MatchData>>) {
+                Log.d("SOCCER_DIAGNOSIS", "📡 서버 응답 성공 여부: ${response.isSuccessful}, 코드: ${response.code()}")
                 if (response.isSuccessful) {
                     response.body()?.let { matches ->
-                        allMatches.clear()
+                        Log.d("SOCCER_DIAGNOSIS", "📡 서버가 실제로 던져준 순수 데이터 개수: ${matches.size}")
+                        if (matches.isNotEmpty()) {
+                            Log.d("SOCCER_DIAGNOSIS", "📡 첫번째 경기 데이터 통짜 샘플: ${matches[0]}")
+                        }
 
+                        allMatches.clear()
                         val uniqueMatches = matches.distinctBy {
                             "${it.homeTeam}_${it.awayTeam}_${it.matchDate}_${it.season}"
                         }
-
                         allMatches.addAll(uniqueMatches)
                         applyFilters()
                     }
@@ -203,7 +221,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<MatchData>>, t: Throwable) {
-                Log.e("DEBUG_LOG", "서버 통신 오류", t)
+                Log.e("SOCCER_DIAGNOSIS", "❌ 서버 통신 자체 실패 (네트워크/IP 끊김)", t)
             }
         })
     }

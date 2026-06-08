@@ -34,4 +34,7 @@ interface ApiService {
 
     @POST("/api/user/register")
     fun register(@Body registerData: Map<String, String>): Call<String>
+
+    @GET("/api/soccer/matches/{fixtureId}/info")
+    fun getMatchInfo(@Path("fixtureId") fixtureId: Long): Call<MatchInfoData>
 }

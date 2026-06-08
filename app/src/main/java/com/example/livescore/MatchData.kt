@@ -2,7 +2,6 @@ package com.example.livescore
 
 import com.google.gson.annotations.SerializedName
 
-// 기존 MatchData에 새 필드 추가
 data class MatchData(
     @SerializedName("fixtureId") val fixtureId: Long?,
     @SerializedName("homeTeam") val homeTeam: String?,
@@ -15,14 +14,15 @@ data class MatchData(
     @SerializedName("season") val season: Int?,
     @SerializedName("leagueId") val leagueId: Int?,
     @SerializedName("matchRound") val matchRound: String?,
-    @SerializedName("stadium") val stadium: String?
+    @SerializedName("stadium") val stadium: String?,
+    @SerializedName("referee") val referee: String?
 )
 
-// --- 상세 페이지용 DTO 추가 ---
 data class LineupData(
     val teamName: String,
     val formation: String?,
     val coachName: String?,
+    val coachPhotoUrl: String?,
     val startXI: List<PlayerData>,
     val substitutes: List<PlayerData>
 )
@@ -50,4 +50,41 @@ data class H2HSummaryData(
     val draws: Int,
     val awayWins: Int,
     val lastMatches: List<MatchData>
+)
+
+data class MatchInfoData(
+    val fixtureId: Long,
+    val momPlayer: MomPlayerData?,
+    val referee: String?,
+    val matchFullDate: String?,
+    val events: List<MatchEventData> = emptyList(),
+    val statistics: List<MatchStatItemData> = emptyList(),
+    val homeTopPlayers: List<MomPlayerData> = emptyList(), // 🌟 홈팀 평점 TOP 5
+    val awayTopPlayers: List<MomPlayerData> = emptyList()  // 🌟 원정팀 평점 TOP 5
+)
+
+data class MomPlayerData(
+    val playerId: Long,
+    val name: String,
+    val teamName: String,
+    val photoUrl: String?,
+    val rating: Double
+)
+
+data class MatchEventData(
+    val time: Int,
+    val extraTime: Int?,
+    val teamId: Int,
+    val teamName: String?,
+    val type: String,
+    val detail: String?,
+    val playerName: String?,
+    val assistPlayerName: String?
+)
+
+data class MatchStatItemData(
+    val category: String,
+    val name: String,
+    val homeValue: String,
+    val awayValue: String
 )

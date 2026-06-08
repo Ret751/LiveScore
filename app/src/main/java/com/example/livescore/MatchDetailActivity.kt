@@ -17,71 +17,85 @@ class MatchDetailActivity : AppCompatActivity() {
         binding = ActivityMatchDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1. Intent에서 데이터 꺼내기
         val fixtureId = intent.getLongExtra("fixtureId", -1L)
-        val homeTeam = intent.getStringExtra("homeTeam")
-        val awayTeam = intent.getStringExtra("awayTeam")
+        val homeTeam = intent.getStringExtra("homeTeam") ?: "Home"
+        val awayTeam = intent.getStringExtra("awayTeam") ?: "Away"
         val homeTeamId = intent.getIntExtra("homeTeamId", 0)
         val awayTeamId = intent.getIntExtra("awayTeamId", 0)
-        val matchTime = intent.getStringExtra("matchTime")
+        val matchTime = intent.getStringExtra("matchTime") ?: "23:00"
         val matchDate = intent.getStringExtra("matchDate")
+        val score = intent.getStringExtra("score") ?: "VS"
         val leagueId = intent.getIntExtra("leagueId", 0)
         val season = intent.getIntExtra("season", 2024)
         val stadium = intent.getStringExtra("stadium")
         val matchRound = intent.getStringExtra("matchRound")
 
-        // 2. 상단 헤더 UI 세팅
         binding.tvDetailHomeName.text = homeTeam
         binding.tvDetailAwayName.text = awayTeam
-        binding.tvDetailTime.text = matchTime
+        binding.tvDetailScore.text = score.replace("-", " - ")
 
-        // 날짜 형식 가공 (예: "05-07" -> "5월 7일")
+        var finalDateString = matchDate ?: "날짜 미정"
         if (matchDate != null && matchDate.contains("-")) {
             try {
                 val dateParts = matchDate.split("-")
-                val month = dateParts[0].toInt().toString()
-                val day = dateParts[1].toInt().toString()
+                val month = if (dateParts.size == 3) dateParts[1].toInt().toString() else dateParts[0].toInt().toString()
+                val day = if (dateParts.size == 3) dateParts[2].toInt().toString() else dateParts[1].toInt().toString()
 
-                val todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("MM-dd"))
-                if (matchDate == todayStr) {
-                    binding.tvDetailDateStatus.text = "오늘 (${month}월 ${day}일)"
+                val todayStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                finalDateString = if (matchDate == todayStr) {
+                    "오늘 (${month}월 ${day}일)"
                 } else {
-                    binding.tvDetailDateStatus.text = "${month}월 ${day}일"
+                    "${month}월 ${day}일"
                 }
             } catch (e: Exception) {
-                binding.tvDetailDateStatus.text = matchDate
+                finalDateString = matchDate
             }
-        } else {
-            binding.tvDetailDateStatus.text = matchDate ?: "날짜 미정"
         }
 
-        // 팀 로고 로딩
+        binding.tvDetailMatchStatus.text = "$finalDateString | $matchTime"
+
         val homeLogoUrl = "https://media.api-sports.io/football/teams/$homeTeamId.png"
         val awayLogoUrl = "https://media.api-sports.io/football/teams/$awayTeamId.png"
 
         Glide.with(this).load(homeLogoUrl).into(binding.ivDetailHomeLogo)
         Glide.with(this).load(awayLogoUrl).into(binding.ivDetailAwayLogo)
 
-        // 3. 뷰페이저(ViewPager2) 및 탭 레이아웃 설정
+        val tabTitles = mutableListOf<String>()
+
+        when {
+            matchTime.contains("종료") || matchTime.contains("FT") -> {
+                tabTitles.addAll(listOf("정보", "라인업", "전체 통계", "상대전적"))
+            }
+            matchTime.contains("전반") || matchTime.contains("후반") || matchTime.contains("하프타임") || matchTime.contains("진행중") -> {
+                tabTitles.addAll(listOf("정보", "라인업", "전체 통계", "상대전적"))
+            }
+            matchTime.contains(":") || matchTime.isEmpty() -> {
+                tabTitles.addAll(listOf("미리보기", "라인업", "순위", "상대전적"))
+            }
+            else -> {
+                tabTitles.addAll(listOf("미리보기", "라인업", "순위", "상대전적"))
+            }
+        }
+
         val adapter = MatchDetailPagerAdapter(
-            this,
-            fixtureId,
-            leagueId,
-            season,
-            homeTeamId,
-            awayTeamId,
-            stadium,     // 🌟 추가됨
-            matchRound   // 🌟 추가됨
+            fa = this,
+            fixtureId = fixtureId,
+            leagueId = leagueId,
+            season = season,
+            homeTeamId = homeTeamId,
+            awayTeamId = awayTeamId,
+            stadium = stadium,
+            round = matchRound,
+            tabTitles = tabTitles,
+            homeTeamName = homeTeam, // 🌟 추가됨
+            awayTeamName = awayTeam  // 🌟 추가됨
         )
         binding.viewPager.adapter = adapter
 
-        // 탭 제목 설정
-        val tabTitles = listOf("미리보기", "라인업", "순위", "상대전적")
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = tabTitles[position]
         }.attach()
 
-        // 4. 뒤로가기 버튼 기능
         binding.btnBack.setOnClickListener {
             finish()
         }
