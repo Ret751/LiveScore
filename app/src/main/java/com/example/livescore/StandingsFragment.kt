@@ -1,5 +1,6 @@
 package com.example.livescore
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -29,11 +30,31 @@ class StandingsFragment : Fragment() {
                 if (response.isSuccessful) {
                     val standings = response.body() ?: return
                     binding.rvStandings.layoutManager = LinearLayoutManager(context)
-                    binding.rvStandings.adapter = StandingsAdapter(standings, homeId, awayId)
+                    binding.rvStandings.adapter = StandingsAdapter(
+                        standings, homeId, awayId
+                    ) { standing ->
+                        val intent = Intent(requireContext(), TeamDetailActivity::class.java).apply {
+                            putExtra("teamId",     standing.teamId)
+                            putExtra("teamName",   standing.teamName)
+                            putExtra("leagueId",   leagueId)
+                            putExtra("leagueName", leagueIdToName(leagueId))
+                            putExtra("season",     season)
+                        }
+                        startActivity(intent)
+                    }
                 }
             }
             override fun onFailure(call: Call<List<StandingData>>, t: Throwable) {}
         })
+    }
+
+    private fun leagueIdToName(id: Int) = when (id) {
+        39  -> "프리미어리그"
+        140 -> "라리가"
+        78  -> "분데스리가"
+        135 -> "세리에 A"
+        61  -> "리그 1"
+        else -> "리그 $id"
     }
 
     companion object {

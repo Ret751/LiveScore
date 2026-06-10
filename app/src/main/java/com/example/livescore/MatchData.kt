@@ -41,8 +41,13 @@ data class StandingData(
     val teamId: Int,
     val points: Int,
     val played: Int,
-    val goalsDiff: Int,
-    val form: String?
+    val win: Int = 0,
+    val draw: Int = 0,
+    val lose: Int = 0,
+    val goalsFor: Int = 0,
+    val goalsAgainst: Int = 0,
+    val goalsDiff: Int = 0,
+    val form: String? = null
 )
 
 data class H2HSummaryData(
@@ -87,4 +92,76 @@ data class MatchStatItemData(
     val name: String,
     val homeValue: String,
     val awayValue: String
+)
+
+// ── 구단 경기 페이지 ──────────────────────────────────
+data class TeamMatchesPageData(
+    val matches:     List<MatchData>,
+    val hasMore:     Boolean,
+    val currentPage: Int,
+    val totalPages:  Int
+)
+
+// ── 구단 개요 ──────────────────────────────────────
+data class TeamOverviewData(
+    val recentMatches:  List<RecentMatchData>,
+    val miniStandings:  List<StandingData>,
+    val venue:          VenueData?,
+    val leagueTrophies: List<TrophyData>
+)
+
+data class RecentMatchData(
+    val fixtureId:  Long?,
+    val homeTeamId: Int?,
+    val awayTeamId: Int?,
+    val homeTeam:   String?,
+    val awayTeam:   String?,
+    val score:      String?,
+    val result:     String?,   // "W" | "D" | "L"
+    val matchDate:  String?
+)
+
+data class VenueData(
+    val name:     String?,
+    val address:  String?,
+    val city:     String?,
+    val capacity: Int?,
+    val surface:  String?,
+    val imageUrl: String?
+)
+
+data class TrophyData(
+    val league:        String?,
+    val country:       String?,
+    val winCount:      Int,
+    val lastWinSeason: String?
+)
+
+// ── 구단 통계 ──────────────────────────────────────
+data class TeamStatsData(
+    val homeRecord:     RecordData?,
+    val awayRecord:     RecordData?,
+    val ratingRanking:  List<PlayerRankData>,
+    val goalRanking:    List<PlayerRankData>,
+    val assistRanking:  List<PlayerRankData>
+)
+
+data class RecordData(
+    val played:       Int,
+    val win:          Int,
+    val draw:         Int,
+    val lose:         Int,
+    val goalsFor:     Int,
+    val goalsAgainst: Int,
+    val goalsDiff:    Int,
+    val points:       Int
+)
+
+data class PlayerRankData(
+    val rank:        Int,
+    val playerId:    Long,
+    val playerName:  String,
+    val photoUrl:    String?,
+    val value:       Double,
+    val appearances: Int
 )

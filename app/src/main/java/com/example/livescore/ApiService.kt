@@ -7,9 +7,12 @@ import retrofit2.http.Query
 import retrofit2.http.Body
 import retrofit2.http.POST
 interface ApiService {
-    // 1. 메인 화면: 전체 경기 목록 가져오기
+    // 1. 메인 화면: 날짜 + 리그 필터로 경기 목록 조회 (서버 사이드 필터링)
     @GET("/api/soccer/matches")
-    fun getMatches(): Call<List<MatchData>>
+    fun getMatches(
+        @Query("date")     date:     String? = null,
+        @Query("leagueId") leagueId: Int?    = null
+    ): Call<List<MatchData>>
 
     // 2. 상세 화면 (라인업): fixtureId로 조회
     @GET("/api/soccer/lineups/{fixtureId}")
@@ -37,4 +40,25 @@ interface ApiService {
 
     @GET("/api/soccer/matches/{fixtureId}/info")
     fun getMatchInfo(@Path("fixtureId") fixtureId: Long): Call<MatchInfoData>
+
+    @GET("/api/soccer/team/{teamId}/stats")
+    fun getTeamStats(
+        @Path("teamId")    teamId:   Int,
+        @Query("leagueId") leagueId: Int,
+        @Query("season")   season:   Int
+    ): Call<TeamStatsData>
+
+    @GET("/api/soccer/team/{teamId}/matches")
+    fun getTeamMatches(
+        @Path("teamId") teamId: Int,
+        @Query("page")  page:   Int,
+        @Query("size")  size:   Int = 15
+    ): Call<TeamMatchesPageData>
+
+    @GET("/api/soccer/team/{teamId}/overview")
+    fun getTeamOverview(
+        @Path("teamId")    teamId:   Int,
+        @Query("leagueId") leagueId: Int,
+        @Query("season")   season:   Int
+    ): Call<TeamOverviewData>
 }

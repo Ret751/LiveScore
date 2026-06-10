@@ -41,6 +41,7 @@
             android:name=".MatchDetailActivity"
             android:exported="false" />
 
+        <activity android:name=".TeamDetailActivity"/>
     </application>
 
 </manifest>

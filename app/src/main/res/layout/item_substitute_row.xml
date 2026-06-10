@@ -28,6 +28,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/bottomLine">
 
+        <!-- 교체 정보 (교체 진행 시만 visible) -->
+        <TextView
+            android:id="@+id/tvHomeSubInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFB347"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"
+            android:visibility="gone" />
+
         <FrameLayout
             android:layout_width="35dp"
             android:layout_height="35dp">
@@ -79,6 +89,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/bottomLine">
+
+        <!-- 교체 정보 (교체 진행 시만 visible) -->
+        <TextView
+            android:id="@+id/tvAwaySubInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFB347"
+            android:textSize="12sp"
+            android:layout_marginBottom="2dp"
+            android:visibility="gone" />
 
         <FrameLayout
             android:layout_width="35dp"

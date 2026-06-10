@@ -96,8 +96,39 @@ class MatchDetailActivity : AppCompatActivity() {
             tab.text = tabTitles[position]
         }.attach()
 
-        binding.btnBack.setOnClickListener {
-            finish()
+        binding.btnBack.setOnClickListener { finish() }
+
+        // 엠블럼 클릭 → 구단 상세 페이지 이동
+        val leagueName = leagueIdToName(leagueId)
+
+        binding.ivDetailHomeLogo.setOnClickListener {
+            startTeamDetail(homeTeamId, homeTeam, leagueId, leagueName, season)
         }
+        binding.ivDetailAwayLogo.setOnClickListener {
+            startTeamDetail(awayTeamId, awayTeam, leagueId, leagueName, season)
+        }
+    }
+
+    private fun startTeamDetail(
+        teamId: Int, teamName: String,
+        leagueId: Int, leagueName: String, season: Int
+    ) {
+        val intent = android.content.Intent(this, TeamDetailActivity::class.java).apply {
+            putExtra("teamId", teamId)
+            putExtra("teamName", teamName)
+            putExtra("leagueId", leagueId)
+            putExtra("leagueName", leagueName)
+            putExtra("season", season)
+        }
+        startActivity(intent)
+    }
+
+    private fun leagueIdToName(leagueId: Int): String = when (leagueId) {
+        39  -> "프리미어리그"
+        140 -> "라리가"
+        78  -> "분데스리가"
+        135 -> "세리에 A"
+        61  -> "리그 1"
+        else -> "리그"
     }
 }

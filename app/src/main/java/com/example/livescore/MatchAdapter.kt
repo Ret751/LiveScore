@@ -7,12 +7,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
 
 class MatchAdapter(private var currentList: List<MatchData>) : RecyclerView.Adapter<MatchAdapter.VH>() {
 
     inner class VH(v: View) : RecyclerView.ViewHolder(v) {
         val tvLeague: TextView = v.findViewById(R.id.tvLeague)
+        val tvFullDate: TextView = v.findViewById(R.id.tvFullDate)
         val tvTime: TextView = v.findViewById(R.id.tvTime)
 
         val tvHomeTeam: TextView = v.findViewById(R.id.tvHomeTeam)
@@ -41,6 +43,11 @@ class MatchAdapter(private var currentList: List<MatchData>) : RecyclerView.Adap
             else -> "유럽 리그"
         }
         holder.tvLeague.text = leagueName
+
+        // 날짜 포맷: "yyyy-MM-dd" → "yyyy/MM/dd"
+        holder.tvFullDate.text = m.matchDate
+            ?.replace("-", "/")
+            ?: ""
 
         holder.tvTime.text = m.matchTime ?: "시간 미정"
         holder.tvHomeTeam.text = m.homeTeam ?: "Unknown"
@@ -85,7 +92,15 @@ class MatchAdapter(private var currentList: List<MatchData>) : RecyclerView.Adap
     }
 
     fun updateData(newList: List<MatchData>) {
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize() = currentList.size
+            override fun getNewListSize() = newList.size
+            override fun areItemsTheSame(oldPos: Int, newPos: Int) =
+                currentList[oldPos].fixtureId == newList[newPos].fixtureId
+            override fun areContentsTheSame(oldPos: Int, newPos: Int) =
+                currentList[oldPos] == newList[newPos]
+        })
         currentList = newList
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
     }
 }
